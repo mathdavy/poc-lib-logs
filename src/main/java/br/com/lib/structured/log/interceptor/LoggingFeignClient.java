@@ -1,8 +1,9 @@
 package br.com.lib.structured.log.interceptor;
 
 import br.com.lib.structured.log.core.LoggerContextHolder;
-import br.com.lib.structured.log.model.LoggerModel;
-import br.com.lib.structured.log.model.RouteStep;
+import br.com.lib.structured.log.enums.RouteStepsType;
+import br.com.lib.structured.log.model.logger.LoggerModel;
+import br.com.lib.structured.log.model.routes.impl.FeignRouteStep;
 import feign.Client;
 import feign.Request;
 import feign.Response;
@@ -25,25 +26,25 @@ public class LoggingFeignClient implements Client {
 
         LoggerModel ctx = LoggerContextHolder.get();
 
-        RouteStep step = null;
+        FeignRouteStep step = null;
 
         if (ctx != null) {
-            step = new RouteStep();
-            step.setType("HTTP");
+            step = new FeignRouteStep();
+            step.setType(RouteStepsType.REST);
             step.setTarget(request.url());
-            step.setMethod(request.httpMethod().name());
+            step.setHttpMethod(request.httpMethod().name());
 
-            step.setRequest(extractRequest(request));
+            step.setRequestBody(extractRequest(request));
         }
 
         try {
             Response response = delegate.execute(request, options);
 
             if (step != null) {
-                step.setStatus(String.valueOf(response.status()));
+                step.setResponseStatus(String.valueOf(response.status()));
 
                 Object body = extractResponseBody(response);
-                step.setResponse(body);
+                step.setResponseBody(body);
 
                 ctx.addStep(step);
 
@@ -56,8 +57,8 @@ public class LoggingFeignClient implements Client {
         } catch (Exception e) {
 
             if (step != null) {
-                step.setStatus("ERROR");
-                step.setResponse(e.getMessage());
+                step.setResponseStatus("ERROR");
+                step.setResponseBody(e.getMessage());
 
                 ctx.addStep(step);
             }

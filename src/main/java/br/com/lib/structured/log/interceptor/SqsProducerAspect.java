@@ -1,12 +1,14 @@
 package br.com.lib.structured.log.interceptor;
 
 import br.com.lib.structured.log.core.LoggerContextHolder;
-import br.com.lib.structured.log.model.LoggerModel;
-import br.com.lib.structured.log.model.RouteStep;
+import br.com.lib.structured.log.model.logger.LoggerModel;
+import br.com.lib.structured.log.model.routes.impl.SqsRouteStep;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+
+import static br.com.lib.structured.log.enums.RouteStepsType.SQS;
 
 @Aspect
 @Component
@@ -18,19 +20,19 @@ public class SqsProducerAspect {
         LoggerModel ctx = LoggerContextHolder.get();
         if (ctx == null) return jp.proceed();
 
-        RouteStep step = new RouteStep();
-        step.setType("SQS");
+        SqsRouteStep step = new SqsRouteStep();
+        step.setType(SQS);
         step.setTarget("queue");
 
-        step.setRequest(jp.getArgs());
+        step.setRequestBody(jp.getArgs());
 
         try {
             Object result = jp.proceed();
-            step.setStatus("SUCCESS");
+            //step.setStatus("SUCCESS");
             return result;
 
         } catch (Exception e) {
-            step.setStatus("ERROR");
+            //step.setStatus("ERROR");
             throw e;
 
         } finally {

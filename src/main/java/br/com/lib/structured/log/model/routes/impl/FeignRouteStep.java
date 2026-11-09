@@ -1,5 +1,6 @@
-package br.com.lib.structured.log.model;
+package br.com.lib.structured.log.model.routes.impl;
 
+import br.com.lib.structured.log.model.routes.RouteStep;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
@@ -9,15 +10,9 @@ import lombok.Setter;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"type", "target", "method", "status", "request", "response"})
-public class RouteStep {
+public class FeignRouteStep extends RouteStep {
 
-    private String type; // HTTP, SQS, KAFKA
-    private String target;
-
-    private String method;
-
-    private String status;
-
-    private Object request;
-    private Object response;
+    private String httpMethod;
+    private Object responseBody;
+    private String responseStatus;
 }

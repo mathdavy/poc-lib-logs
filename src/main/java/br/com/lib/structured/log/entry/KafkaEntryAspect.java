@@ -1,6 +1,6 @@
-package br.com.lib.structured.log.adapter;
+package br.com.lib.structured.log.entry;
 
-import br.com.lib.structured.log.adapter.abstraction.AbstractEntryAspect;
+import br.com.lib.structured.log.entry.abstraction.AbstractEntryAspect;
 import br.com.lib.structured.log.model.EntryData;
 import br.com.lib.structured.log.utils.AnnotationUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -11,33 +11,34 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
+import static br.com.lib.structured.log.enums.EntryTypeEnum.KAFKA;
+
 @Aspect
 @Component
-public class SqsEntryAspect extends AbstractEntryAspect {
+public class KafkaEntryAspect extends AbstractEntryAspect {
 
-    @Around("@annotation(io.awspring.cloud.sqs.annotation.SqsListener)")
+    @Around("@annotation(org.springframework.kafka.annotation.KafkaListener)")
     public Object intercept(ProceedingJoinPoint jp) throws Throwable {
 
         EntryData entry = new EntryData();
-        entry.setType("SQS");
-        entry.setSource(resolveQueueName(jp));
+        entry.setType(KAFKA);
+        entry.setSource(resolveTopic(jp));
         entry.setPayload(jp.getArgs());
 
         return execute(jp, entry);
-
     }
 
-    private String resolveQueueName(ProceedingJoinPoint jp) {
+    private String resolveTopic(ProceedingJoinPoint jp) {
 
         Method method = ((MethodSignature) jp.getSignature()).getMethod();
 
         return AnnotationUtils.findAnnotation(
                         method,
-                        "io.awspring.cloud.sqs.annotation.SqsListener"
+                        "org.springframework.kafka.annotation.KafkaListener"
                 )
                 .map(annotation -> {
-                    String[] queues = (String[]) AnnotationUtils.getValue(annotation, "value");
-                    return (queues != null && queues.length > 0) ? queues[0] : "unknown";
+                    String[] topics = (String[]) AnnotationUtils.getValue(annotation, "topics");
+                    return (topics != null && topics.length > 0) ? topics[0] : "unknown";
                 })
                 .orElse("unknown");
     }
