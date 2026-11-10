@@ -1,5 +1,6 @@
 package br.com.lib.structured.log.entry;
 
+import br.com.lib.structured.log.LoggerLifecycle;
 import br.com.lib.structured.log.entry.abstraction.AbstractEntryAspect;
 import br.com.lib.structured.log.model.EntryData;
 import br.com.lib.structured.log.utils.AnnotationUtils;
@@ -16,6 +17,10 @@ import static br.com.lib.structured.log.enums.EntryTypeEnum.KAFKA;
 @Aspect
 @Component
 public class KafkaEntryAspect extends AbstractEntryAspect {
+
+    public KafkaEntryAspect(LoggerLifecycle loggerLifecycle) {
+        super(loggerLifecycle);
+    }
 
     @Around("@annotation(org.springframework.kafka.annotation.KafkaListener)")
     public Object intercept(ProceedingJoinPoint jp) throws Throwable {

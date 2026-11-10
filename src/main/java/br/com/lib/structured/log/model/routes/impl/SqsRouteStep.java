@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"type", "target", "requestBody", "timeSpent", "error"})
+@JsonPropertyOrder({"type", "target", "request", "timeSpent", "error"})
 public class SqsRouteStep extends RouteStep {
 }

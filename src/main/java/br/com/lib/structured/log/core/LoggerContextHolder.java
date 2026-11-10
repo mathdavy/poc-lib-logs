@@ -7,6 +7,7 @@ import br.com.lib.structured.log.model.logger.impl.RestLoggerModel;
 import br.com.lib.structured.log.model.logger.impl.AsyncLoggerModel;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -39,6 +40,9 @@ public final class LoggerContextHolder {
             throw new IllegalArgumentException("Unknown entry type: " + type);
         }
         LoggerModel model = factory.apply(entryData);
+        // traceId recebido (header HTTP / message attribute SQS) é mantido; senão o fluxo nasce aqui
+        String traceId = entryData.getTraceId();
+        model.setTraceId(traceId == null || traceId.isBlank() ? UUID.randomUUID().toString() : traceId);
         model.setEntryType(type.name());
         model.setEntryPoint(entryData.getSource());
         model.setRequestBody(entryData.getPayload());

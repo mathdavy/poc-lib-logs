@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"type", "methodName", "requestBody", "responseBody", "timeSpent", "error"})
+@JsonPropertyOrder({"type", "methodName", "request", "responseBody", "timeSpent", "error"})
 public class MethodRouteStep extends RouteStep {
 
     private String methodName;

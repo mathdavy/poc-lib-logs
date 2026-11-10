@@ -25,24 +25,21 @@ public class LoggerLifecycle {
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter)))
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    private static final ThreadLocal<Long> timeSpent = new ThreadLocal<>();
-
     public void start(EntryData entryData) {
-        timeSpent.set(System.nanoTime());
         LoggerContextHolder.init(entryData);
+        LoggerContextHolder.get().setStartNanos(System.nanoTime());
     }
 
     public void finish() {
         logFinal();
         LoggerContextHolder.clear();
-        timeSpent.remove();
     }
 
     private void logFinal() {
         try {
             LoggerModel model = LoggerContextHolder.get();
             model.setDate(LocalDateTime.now());
-            model.setTimeSpent(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - timeSpent.get())); // tempo gasto em ms
+            model.setTimeSpent(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - model.getStartNanos())); // tempo gasto em ms
 
             String json = mapper.writeValueAsString(model);
 

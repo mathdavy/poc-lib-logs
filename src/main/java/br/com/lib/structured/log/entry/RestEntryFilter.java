@@ -42,9 +42,11 @@ public class RestEntryFilter extends OncePerRequestFilter {
         EntryData entryData = buildEntryData(request, headers);
         loggerLifecycle.start(entryData);
 
-        filterChain.doFilter(request, response);
-
-        loggerLifecycle.finish();
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            loggerLifecycle.finish();
+        }
     }
 
     private EntryData buildEntryData(HttpServletRequest request, Map<String, String> headers) {
@@ -54,7 +56,9 @@ public class RestEntryFilter extends OncePerRequestFilter {
         entry.setMethod(request.getMethod());
         //entry.setPayload(request.get);
         entry.setHeaders(headers);
-        entry.setTraceId(headers.getOrDefault(Constants.TRACE_ID_KEY, UUID.randomUUID().toString()));
+        // getHeader é case-insensitive (o Map de headers vem em minúsculas do Tomcat).
+        // Se não vier, o LoggerContextHolder gera um novo traceId.
+        entry.setTraceId(request.getHeader(Constants.TRACE_ID_KEY));
 
         return entry;
     }

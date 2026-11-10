@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"type", "target", "requestBody", "correlationId", "timeSpent", "error"})
+@JsonPropertyOrder({"type", "target", "request", "correlationId", "timeSpent", "error"})
 public class KafkaRouteStep extends RouteStep {
     private String correlationId;
 }
